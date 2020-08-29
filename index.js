@@ -35,7 +35,7 @@ app.post("/upload", (req, res) => {
     if (err instanceof multer.MulterError) {
       return res.status(500).json({ err, message: "Multer error" });
     } else if (err) {
-      return res.status(500).json({ err, message: "Multer error" });
+      return res.status(500).json({ err, message: "Some other Multer error" });
     }
 
     let users = [];
