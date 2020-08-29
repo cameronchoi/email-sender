@@ -12,18 +12,6 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-app.get("/", (req, res) => {
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      res.send("<h1>Successfully sent!</h1>");
-      console.log("Email sent: " + info.response);
-    }
-  });
-  res.send("<h1>Hello world</h1>");
-});
-
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "file");
@@ -35,7 +23,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).single("file");
 
-app.post("/", (req, res) => {
+app.post("/upload", (req, res) => {
   const emailSender = req.headers.email.trim();
   const emailPassword = req.headers.password;
   console.log("--------_STOP-------------");
@@ -75,7 +63,7 @@ app.post("/", (req, res) => {
   </p>
   <p>Please use the email you provided when applying to sign in to the website.</p>
   <p>Your password is ${user.autoPassword}</p>
-  <p>Once signed in please change your password which can be done through the home page or by going to <a href="https://180dcusyd.org/changepassword">180dcusyd.org/changepassword</a>.</p>
+  <p>Once signed in please change your password. This can be done through the home page or by going to <a href="https://180dcusyd.org/changepassword">180dcusyd.org/changepassword</a>.</p>
   <p>Kind regards,</p>
   <div dir="ltr" data-smartmail="gmail_signature">
     <div dir="ltr">
