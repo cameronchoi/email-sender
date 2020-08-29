@@ -33,9 +33,9 @@ app.post("/upload", (req, res) => {
   console.log("--------_STOP-------------");
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      return res.status(500).json(err);
+      return res.status(500).json({ err, message: "Multer error" });
     } else if (err) {
-      return res.status(500).json(err);
+      return res.status(500).json({ err, message: "Multer error" });
     }
 
     let users = [];
@@ -544,7 +544,9 @@ app.post("/upload", (req, res) => {
 
           transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
-              return res.status(500).json(error);
+              return res
+                .status(500)
+                .json({ error, message: "Failed trying to send mail" });
             } else {
               console.log("Email sent: " + info.response);
               console.log(i);
