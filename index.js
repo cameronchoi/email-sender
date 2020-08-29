@@ -23,6 +23,10 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).single("file");
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.post("/upload", (req, res) => {
   const emailSender = req.headers.email.trim();
   const emailPassword = req.headers.password;
