@@ -27,6 +27,21 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+const sendMailPromise = (transportObj, mailOptions) => {
+  return new Promise((resolve, reject) => {
+    let transporter = nodemailer.createTransport(transportObj);
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log("error is " + error);
+        reject(error);
+      } else {
+        console.log("Email sent: " + info.response);
+        resolve(info);
+      }
+    });
+  });
+};
+
 app.post("/upload", (req, res) => {
   const emailSender = req.headers.email.trim();
   const emailPassword = req.headers.password;
@@ -40,6 +55,8 @@ app.post("/upload", (req, res) => {
 
     let users = [];
 
+    let promiseArr = [];
+
     fs.createReadStream("./file/list.csv")
       .pipe(csv())
       .on("data", (row) => {
@@ -52,14 +69,6 @@ app.post("/upload", (req, res) => {
       .on("end", () => {
         console.log("CSV file successfully processed");
         users.forEach((user, i) => {
-          var transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-              user: emailSender,
-              pass: emailPassword,
-            },
-          });
-
           let html = `<p>Dear ${user.firstName} ${user.lastName},</p>
   <p>
     In order to access the interview allocation website please go to
@@ -542,21 +551,29 @@ app.post("/upload", (req, res) => {
             html: html,
           };
 
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              return res
-                .status(500)
-                .json({ error, message: "Failed trying to send mail" });
-            } else {
-              console.log("Email sent: " + info.response);
-              console.log(i);
-              console.log(users.length - 1);
-              if (i === users.length - 1) {
-                return res.status(200).json("Emails successfully sent");
-              }
-            }
-          });
+          promiseArr.push(
+            sendMailPromise(
+              {
+                service: "gmail",
+                auth: {
+                  user: emailSender,
+                  pass: emailPassword,
+                },
+              },
+              mailOptions
+            )
+          );
         });
+
+        Promise.all(promiseArr)
+          .then((message) => {
+            console.log(message);
+            return res.status(200).json("Emails successfully sent");
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(500).json(err);
+          });
       });
   });
 });

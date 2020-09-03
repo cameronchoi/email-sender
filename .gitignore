@@ -6,3 +6,6 @@ node_modules/
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 180dcusyd-87f20b7d75fe.json
+credentials.json
+credentials2.json
+token.json
